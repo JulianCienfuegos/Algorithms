@@ -6,20 +6,6 @@
  * My first Java program!
  * 
  */
-
-
-/*
- * Steps:
- *	 Read in data from the input file.
- */
- 
- /*
-  * Important Variables:
-  * 1. n - number of vertices
-  * 2. dist - distance between vert i and vert j
-  * 3. length - length of the path from starting at v which passes through W and arrives at s. 
-  */
-  
   
 /*
  * I am using strings for all the numerical values because I dont 
@@ -55,25 +41,11 @@ public class Salesman {
 				e.printStackTrace();
 		}
 		
-		/*
-		 * Make sure I read in the file correctly.
-		 */
-		System.out.println();
-		System.out.println("These are the weights in the input file.:");
-		System.out.println();
-		for (int i = 0; i < n; i++){
-			for (int j = 0; j < n; j++){
-				System.out.print( dist.get(i*n + j) );
-				System.out.print(" ");
-			}
-			System.out.println();
-		}
-		
 		/* 
 		 * Construct the set V
 		 */
 		 
- 		Set<String> V = new HashSet<String>();
+ 		HashSet<String> V = new HashSet<String>();
 		for(int i = 0; i < n; i++){
 			V.add(Integer.toString(i));	
 		}
@@ -81,37 +53,26 @@ public class Salesman {
 		/*
 		 * Construct the power set of V - {s}. 
 		 * These will be the Ws we use.
+		 * Thank you to this webpage:
+		 * stackoverflow.com/questions/1670862/obtaining-a-powerset-of-a-set-in-java
 		 */
 		 
-		Set<String>Vprime = new HashSet<String>();
+		HashSet<String>Vprime = new HashSet<String>();
 		Vprime.addAll(V);
-		Vprime.remove(0);
-		List<Set<String>> powerSet = new ArrayList<Set<String>>();
-		for(String addToSets:Vprime) {
-			List<Set<String>> newSets = new ArrayList<Set<String>>();
-			for(Set<String> curSet:powerSet) {
-				Set<String> copyPlusNew = new HashSet<String>();
-				copyPlusNew.addAll(curSet);
-				copyPlusNew.add(addToSets);
-				newSets.add(copyPlusNew);
+		Vprime.remove(Integer.toString(0));
+		List<HashSet<String>> powerSet = new ArrayList<HashSet<String>>();
+		for(String addToHashSets:Vprime) {
+			List<HashSet<String>> newHashSets = new ArrayList<HashSet<String>>();
+			for(HashSet<String> curHashSet:powerSet) {
+				HashSet<String> copyPlusNew = new HashSet<String>();
+				copyPlusNew.addAll(curHashSet);
+				copyPlusNew.add(addToHashSets);
+				newHashSets.add(copyPlusNew);
 			}
-			Set<String> newVSet = new HashSet<String>();
-			newVSet.add(addToSets);
-			newSets.add(newVSet);
-			powerSet.addAll(newSets);
-		}
-		
-		/*
-		 * Have a look at the generated subsets
-		 */
-		System.out.println();
-		System.out.println("This is the power set:");
-		System.out.println();
-		for(Set<String> set:powerSet) {
-			for(String setEntry:set) {
-				System.out.print(setEntry + " ");
-			}
-			System.out.println();
+			HashSet<String> newVHashSet = new HashSet<String>();
+			newVHashSet.add(addToHashSets);
+			newHashSets.add(newVHashSet);
+			powerSet.addAll(newHashSets);
 		}
 		
 		/*
@@ -132,52 +93,59 @@ public class Salesman {
 		 */
 		
 		for(int i = 1; i <= n - 1; i++){
-			for(Set<String> W : powerSet){
+			for(HashSet<String> W : powerSet){
 				if(W.size() == i){
-					Set<String> VminusW = new HashSet<String>();
+					HashSet<String> VminusW = new HashSet<String>();
 					VminusW.addAll(V);
 					VminusW.removeAll(W);
-					double minimum = 0.0;
+					double minimum = Double.POSITIVE_INFINITY;
 					for (String v : VminusW){
-						// Here we update length
-						// This first value will be v. 
-						// The second value is a hash map, which we have to make.
-						// This hash map takes a HashSet and a String as a parameter
-						// Where the string is the length of the path 
-						// from v to s through the vertices in the HashSet.
 						for(String v1 : W){
-							HashMap <HashSet, String> MapOfSets = new HashMap<HashSet, String>(length.get(v1));
-							Set <String> Wminusv1 = new HashSet<String>();
+							
+							HashMap <HashSet<String>, String> MapOfSets = new HashMap<HashSet<String>, String>(length.get(v1));
+							HashSet <String> Wminusv1 = new HashSet<String>();
 							Wminusv1.addAll(W);
 							Wminusv1.remove(v1);
 							
 							int I = Integer.parseInt(v);
 							int J = Integer.parseInt(v1);
 						    double value = Double.parseDouble( dist.get(I*n + J) ) +  Double.parseDouble( MapOfSets.get(Wminusv1) );
-							System.out.println("Value in MapOfSets: ");
-							System.out.println(MapOfSets.get(Wminusv1));
+						    if (value < minimum){
+								minimum = value;
+							}
 						}
+						HashMap <HashSet<String>, String> NewMapEntry = new HashMap<HashSet<String>, String>(length.get(v));
+						NewMapEntry.put(W, Double.toString(minimum));
+						length.put(v, NewMapEntry);
 					}
 				}
 			}
 		}
 		
-		
-		Set entries = length.entrySet();
-		Iterator i = entries.iterator();
-		while(i.hasNext()){
-			
-			Map.Entry me = (Map.Entry)i.next();
-			System.out.print(me.getKey() + ": ");
-			System.out.println(me.getValue());
-		}
-		
-		if(length.containsKey(0)){
-			System.out.println("integers and ints are sometimes interchangeable!");
-		}
-		
+		HashMap <HashSet<String>, String> TST = new HashMap<HashSet<String>, String>(length.get(Integer.toString(0)));
+		String shortestPath = TST.get(Vprime);
 
-
-
+		/*
+		 * Write to the output file.
+		 */
+		 PrintWriter out = null;
+		  try {
+				out = new PrintWriter(new FileWriter("output.txt"));
+				out.println(shortestPath);
+			} catch (IndexOutOfBoundsException e) {
+				System.err.println("Caught IndexOutOfBoundsException: "
+								   +  e.getMessage());
+										 
+			} catch (IOException e) {
+				System.err.println("Caught IOException: " +  e.getMessage());
+										 
+			} finally {
+				if (out != null) {
+					out.close();
+				} 
+				else {
+					System.out.println("PrintWriter not open");
+				}
+			}
 	}
 }
