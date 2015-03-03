@@ -1,0 +1,115 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{sectsty}
+\usepackage{calligra}
+\renewcommand*\ttdefault{cmvtt}
+\renewcommand*\familydefault{\ttdefault} 
+\usepackage[T1]{fontenc}
+
+
+\allowdisplaybreaks
+\lhead{CSE 6331 HW3}
+\chead{\Large Melvyn Ian Drag}
+\rhead{\today}
+\setlength{\parskip}{0pt} 
+\setlength{\parindent}{0pt}
+
+\newcommand{\tab}[1]{\hspace*{4ex}\rlap{#1}}
+\newcommand{\st}[1]{\hspace*{4ex}\rlap{#1}\\}
+\newcommand{\dt}[1]{\hspace*{8ex}\rlap{#1}\\}
+\newcommand{\Tt}[1]{\hspace*{12ex}\rlap{#1}\\}
+\newcommand{\Qt}[1]{\hspace*{16ex}\rlap{#1}\\}
+\newcommand{\Ft}[1]{\hspace*{20ex}\rlap{#1}\\}
+\newcommand{\dtab}[1]{\hspace*{8ex}\rlap{#1}\\}
+\newcommand{\tbf}[1]{\textbf{#1}}
+
+\sectionfont{\calligra\centering\Large}
+\subsectionfont{\large}
+
+\begin{document}
+\section*{Problem 1}
+We can recycle the LCS algorithm from class. However, we will compare the set $X^i=\{x_1, \dots, x_{n-1}\}$ to $X^j=\{x_2, \dots, x_{n}\}$, $X^i, X^j \subset X$. Also, we will not not allow $i \ge j$, to make sure that we are only checking later terms against previous terms. This means that we will only fill out the upper triangular elements of b and c. Instead of searching for where elements are equal, we want their absolute difference is less than or equal to 5. The printing code in the end is also very similar to the printing routine presented in the book, with one minor exception. We need to print out not only the elements $x_j$  which satisfied the constraint, but when we are done we need the element $x_i$ which was compared to the initial $x_j$. I took care of this issue by updating a variable called first with an $x_i$ element. 
+\subsection*{Algorithm}
+/* Assume that indexing of c starts at 0, and that indexing of all other arrays start at 1. (I think this makes this code easier to read, because otherwise the indices of c are shifted to accomodate the zeros on the border of the array.)*/\\
+ProblemOne(X):\\
+\st{n = X.length()}
+\st{b = Allocate memory for an n x n character array}
+\st{c = zeros(0:n; 0:n) \color{red}{Gives an n+1 x n+1 array of zeros}}
+\st{for i = 1:n-1}
+\dt{for j = 2:n}
+\Tt{if \big( \big| x[i] - x[j] \big| <= 5\big):}
+\Qt{c[i][j] = c[i-1][j-1] + 1}
+\Qt{b[i][j] = $\nwarrow$}
+\Tt{else if (c[i-1][j]) >= c[i][j-1]):}
+\Qt{c[i][j] = c[i-1][j]}
+\Qt{b[i][j] = $\uparrow$}
+\Tt{else:}
+\Qt{c[i][j] = c[i][j-1]}
+\Qt{b[i][j] = $\leftarrow$}
+\st{return c, b}
+
+Retrieve-LCS(b, X, i, j)\\
+\st{if (( i == 0) || (j == 0)):}
+\dt{Print-LCS(sequence, first)}
+\st{if (b[i][j] == $\nwarrow$ ):}
+\dt{Retrieve-LCS(b, x, i-1, j-1)}
+\dt{sequence.push(x[j])}
+\dt{first = x[i]}
+
+Print-LCS(sequence, first):\\
+\st{print (first)}
+\st{for x in sequence.length() :}
+\dt{print (sequence.pop())}
+
+\subsection*{Time Complexity}
+This algorithm will perform half of the work or the algorithm presented in class for an LCS. The runtime is still $O(n^2)$.The printing will require $O(n)$ time, as stated in the textbook.
+\section*{Problem 2}
+The Catalan Number $\mathcal{C}_{n-1} = \frac1{n}\binom{2(n-1)}{n-1}$ gives the number of ways to parenthesize $n$ matrices. To calculate the cost of multiplying an $p_1\times p_2$ matrix by an $p_2 \times p_3$ matrix, we have to calculate $p_1p_2p_3$, which requires two products. We have to calculate $n-1$ of these products to compute the cost of multiplying $n$ matrices, since during each MM operation we reduce the number of matrices by one, until we get to one left. So, we have to perform $2*(n-1)*\frac1n*\frac{2n!}{n!n!}$ multiplications. Finally, we have to do a reduction on the set of the chains' costs. Since there are $\mathcal{C}_n$ chains, and we need to check the cost of each chain once as we perform the the reduction, we are adding $\mathcal{C}_n$ operations.
+
+The recursive solution will be asymptotically faster, because it calculates all of the possible sub problems for any problem, but in this way does not have to 
+
+\section*{Problem 3}
+The result is not always optimal. Consider the multiplication of matrices corresponding to the `dimension vector'
+$\vec{p} = [2, 3, 2, 1]$. The proposed greedy method says to parenthesize the first and second matrices, since $k=2$. This results in $2(3(2)) + 2(2(1)) = 12 + 4$ scalar products. The optimal parenthization is at $k=1$, giving $2(3(1))+3(2(1)) = 12$ scalar products.
+\section*{Problem 4}
+\subsection*{Algorithm}
+// Indexing starts at 1, not at zero. array[0] gives a seg-fault.
+
+m = X.length()\\
+n = Y.length()\\
+c = zeros(1:m; 1:n)\\
+
+\tbf{LCSRecursion}(i, j, X, Y):\\
+\tab{if (i == 0)||(j == 0): \color{red}{// The string has been entirely investigated.}}\\
+\tab{\tab{return 0}}\\
+\tab{if(c[i][j] != 0): \color{red}{// We have already calculated this.}}\\
+\tab{\tab{return c[i][j]}}\\
+\tab{if(x[i] == y[j]): \color{red}{// We have a match!}}\\
+\dtab{c[i][j] = LCSRecursion(i-1, j-1, X, Y) + 1}
+\dtab{return c[i][j]}
+\tab{else: \color{red}{//return the larger of the LCSs between the indicated substrings.}}\\
+\dtab{len1 = LCSRecursion(i-1, j, X, Y)}
+\dtab{len2 = LCSRecursion(i, j-1, X, Y)}
+\dtab{if (len1 $\ge$ len2):}
+\tab{\dtab{c[i][j] = len1}}\\
+\tab{\dtab{return c[i][j]}}\\
+\dtab{else:}
+\tab{\dtab{c[i][j] = len2}}\\
+\tab{\dtab{return c[i][j]}}\\
+end\\
+\newline
+lcs = LCSRecursion(m, n, X, Y)\\
+\subsection*{Time Complexity}
+If one string is a substring of another, we will have minimal runtime. This is because every call to the function will have a match and we will have no branching. Therefore, we can give the lower bound as:
+\begin{equation*}
+\Omega(M),\;\; M = \min\{m, n\} 
+\end{equation*}
+\end{document}

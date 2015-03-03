@@ -1,0 +1,69 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{enumitem}
+
+\allowdisplaybreaks
+
+\lhead{CSE 6331 HW3}
+\chead{Melvyn Ian Drag}
+\rhead{\today}
+\setlength{\parskip}{0pt} 
+\setlength{\parindent}{0pt}
+\newcommand{\tab}[1]{\hspace*{4ex}\rlap{#1}}
+\newcommand{\tbf}[1]{\textbf{#1}}
+\begin{document}
+\section*{Problem 1}
+\subsection*{Part A}
+True. \\
+
+Either $v$ and $w$ are in the same tree, or they are not.\\
+
+First, consider the case when they are in the same tree. Without loss of generality, assume at some time we reach vertex $v$ before vertex $w$. Then, suppose that after we $n$ recursive calls to Visit() we reach vertex $w$. Then $w.start = v.start + n$. The suppose after $k$ recursive calls to Visit() we have explored the graph below $w$ fully. Then, since every completed Visit() increments time twice,  $w.finish = w.start + 2k + 1$. Then, after some time (depending on the graph), we will eventually return to vertex $v$, and finish with a time $w.finish + C$ for some positive $C$. So $active(v)\subset active(w)$.\\
+
+Second, consider the case in which  $v$ and $w$ are in different trees. Then, assuming without loss of generality that $v$ is visited first, $v$ will start and finish before we return to main loop to root a new tree. Then, the start time for the root of the new tree will be $t > v.finish$. The start and finish times for $w$ satisfy the inequality $w.finish > w.start \ge t > v.finish > v.start$. In this case, $active(v)\cap active(w) = \emptyset$.
+\subsection*{Part B}
+True. By contraposition we see that if $v$ is a descendant of $w$ WLOG in some DFS tree, then the active times have non-empty intersection, as shown in part a.\\
+
+I am assuming this question means a descendant or an ancestor in some tree of some arbitrary forest, not in the union of all possible forests.\\
+
+Consider a DFS starting at $v_2$ which is performed on a two node graph with one directed edge from $v_1$ to $v_2$. $v_1$ is a predecessor to $v_2$, but the intersection of the active times of the two vertices is empty. So, if you mean in the union of all possible forests, then there exists a tree in some forest such that $v_1$ is an ancestor of $v_2$ such that the active times have an empty intersection. In this case, the statement would be false. 
+
+\section*{Problem 2}
+\emph{Algorithm in text:}
+We perform a DFS on the transpose graph. The difference from a traditional DFS is that if a vertex $v$ has an outgoing edge to a white vertex $w$, we set 
+\begin{equation*}
+v.MaxWeight = max(v.weight, w.MaxWeight)
+\end{equation*}
+ which will be recursive since we have to calculate $w.MaxWeight$ by visiting $w$. If $v$ has no outgoing edges, the recursion terminates and $v.MaxWeight = v.weight$. If a vertex $v$ has an outgoing edge to a black vertex $x$, we set 
+\begin{equation*} 
+ v.MaxWeight = max(v.weight, x.MaxWeight)
+ \end{equation*}
+ which will require no recursion. If we ever have an edge to a gray vertex, we collapse the cycle into a single gray vertex $z$ and let $z.weight = max(v.weight)\; v\in Cycle$ vertices in the cycle. Then we continue as previously described. When the algorithm is completed, the cycle vertices in the graph are expanded and their vertices are assigned the maximum weight of the super vertex.\\
+  
+\emph{Pseudocode: } See attached.
+
+\emph{Algorithm proof: } By taking the transpose of the graph
+
+\emph{Analysis: }
+
+
+ The largest cycle we could have is of size $|V|$, or, equivalenty, a set of n cycles which partitions the vertices. The final reduction step to find the maximum in this cycle(s) has complexity $O(|V|)$, and the task of writing the max back to all of the vertices also has complexity $O(|V|)$.
+
+\section*{Problem 3}
+\emph{Preliminary Note:} Once we find the vertex $t$ we want to stop searching for a path to $t$. I am assuming that $t$ has no outgoing edges, and leaving it to the programmer to implement this; a C++ programmer, for instance, could pass the graph by value to my function, and then locally set the number of outgoing edges of $t$ to 0 without this change affecting the global graph. Alternatively, one could make a copy of $t.out\_edges$, then set $t.out\_edges = \{\}$, then copy the edges back after the algorithm completes. \\
+
+\emph{Algorithm in text: }We set the color of vertex $t$ to black, and all of the other vertices to white. Then we perform an \emph{almost} traditional DFS on vertex $s$. Every time we reach vertex $t$ we increment a global variable \emph{NumPaths}. Our DFS is not traditional in that after finishing a gray vertex which isn't $t$ its color is set back to white, whereas $t$ remains black throughout the entire code, telling us to increment the number of paths variable when we reach it.\\
+
+\emph{Pseudocode:} See attached. Havent had time to make a nice pseudocode layout.\\
+
+\emph{Algorithm Proof: } This algorithm will terminate, since all of the loops in the code run for a finite amount of time. The algorithm is correct because, by returning vertices to white, we investigate every outgoing path from every vertex, and only stop when we have reached a dead end. Since we never visit any vertex twice in the same loop, we never duplicate a path.\\
+
+\emph{Analysis: } The worst case run time for this algorithm would be in the case of a complete graph. We would uncover $|V|!$ simple paths.
+\end{document}
