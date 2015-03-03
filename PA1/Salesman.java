@@ -119,10 +119,10 @@ public class Salesman {
 		 * dist (i*n), since s is vert 0.
 		 */
 		 
-		HashMap<String, HashMap> length = new HashMap <String, HashMap>();
+		HashMap<String, HashMap<HashSet<String>, String>> length = new HashMap <String, HashMap<HashSet<String>, String>>(); // NO RAW TYPES
 		for (int vertex = 0; vertex < n; vertex++){
-			HashMap <HashSet, String> MapofSets = new HashMap<HashSet, String> ();
-			MapofSets.put(new HashSet(), dist.get(vertex*n));
+			HashMap <HashSet<String>, String> MapofSets = new HashMap<HashSet<String>, String> ();
+			MapofSets.put(new HashSet<String>(), dist.get(vertex*n));
 			length.put(Integer.toString(vertex), MapofSets);                  // I guess java doesnt like you to use primitives, so Ill cast it as an Integer.
 
 		}
@@ -137,7 +137,7 @@ public class Salesman {
 					Set<String> VminusW = new HashSet<String>();
 					VminusW.addAll(V);
 					VminusW.removeAll(W);
-					Integer minimum = 0;
+					double minimum = 0.0;
 					for (String v : VminusW){
 						// Here we update length
 						// This first value will be v. 
@@ -145,11 +145,18 @@ public class Salesman {
 						// This hash map takes a HashSet and a String as a parameter
 						// Where the string is the length of the path 
 						// from v to s through the vertices in the HashSet.
-						
-						Set <String> Wminusv = new HashSet<String>();
-						Wminusv.addAll(W);
-						Wminusv.remove(v);
-						
+						for(String v1 : W){
+							HashMap <HashSet, String> MapOfSets = new HashMap<HashSet, String>(length.get(v1));
+							Set <String> Wminusv1 = new HashSet<String>();
+							Wminusv1.addAll(W);
+							Wminusv1.remove(v1);
+							
+							int I = Integer.parseInt(v);
+							int J = Integer.parseInt(v1);
+						    double value = Double.parseDouble( dist.get(I*n + J) ) +  Double.parseDouble( MapOfSets.get(Wminusv1) );
+							System.out.println("Value in MapOfSets: ");
+							System.out.println(MapOfSets.get(Wminusv1));
+						}
 					}
 				}
 			}
