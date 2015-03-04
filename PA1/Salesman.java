@@ -12,8 +12,9 @@
  * understand why Java has ints an Integers!
  */
 
+// Dont import the whole library . . .
 import java.io.*;
-import java.util.*; 													// This is bad practice. Ill clean it up if there is time.
+import java.util.*; 													
 
 public class Salesman {
 	public static void main(String args[]) {
@@ -24,7 +25,8 @@ public class Salesman {
 		 */
 		 
 		int n = 0;
-		Vector<String> dist = new Vector<String>(); 					// Vector() is deprecated. If there is time, change this.
+		Vector<String> dist = new Vector<String>(); 
+		// Vector() is deprecated. If there is time, change this.					
 		try{															
 			File file = new File("input.txt");
 			Scanner sc = new Scanner (file);
@@ -80,11 +82,13 @@ public class Salesman {
 		 * dist (i*n), since s is vert 0.
 		 */
 		 
-		HashMap<String, HashMap<HashSet<String>, String>> length = new HashMap <String, HashMap<HashSet<String>, String>>(); // NO RAW TYPES
+		HashMap<String, HashMap<HashSet<String>, String>> length = 
+			new HashMap <String, HashMap<HashSet<String>, String>>(); // NO RAW TYPES
 		for (int vertex = 0; vertex < n; vertex++){
 			HashMap <HashSet<String>, String> MapofSets = new HashMap<HashSet<String>, String> ();
 			MapofSets.put(new HashSet<String>(), dist.get(vertex*n));
-			length.put(Integer.toString(vertex), MapofSets);                  // I guess java doesnt like you to use primitives, so Ill cast it as an Integer.
+			length.put(Integer.toString(vertex), MapofSets);                  
+			// I guess java doesnt like you to use primitives, so Ill cast it as an Integer.
 
 		}
 		
@@ -102,19 +106,22 @@ public class Salesman {
 					for (String v : VminusW){
 						for(String v1 : W){
 							
-							HashMap <HashSet<String>, String> MapOfSets = new HashMap<HashSet<String>, String>(length.get(v1));
+							HashMap <HashSet<String>, String> MapOfSets =
+								new HashMap<HashSet<String>, String>(length.get(v1));
 							HashSet <String> Wminusv1 = new HashSet<String>();
 							Wminusv1.addAll(W);
 							Wminusv1.remove(v1);
 							
 							int I = Integer.parseInt(v);
 							int J = Integer.parseInt(v1);
-						    double value = Double.parseDouble( dist.get(I*n + J) ) +  Double.parseDouble( MapOfSets.get(Wminusv1) );
+						    double value = Double.parseDouble( dist.get(I*n + J) ) +
+								Double.parseDouble( MapOfSets.get(Wminusv1) );
 						    if (value < minimum){
 								minimum = value;
 							}
 						}
-						HashMap <HashSet<String>, String> NewMapEntry = new HashMap<HashSet<String>, String>(length.get(v));
+						HashMap <HashSet<String>, String> NewMapEntry = 
+							new HashMap<HashSet<String>, String>(length.get(v));
 						NewMapEntry.put(W, Double.toString(minimum));
 						length.put(v, NewMapEntry);
 					}
@@ -122,7 +129,8 @@ public class Salesman {
 			}
 		}
 		
-		HashMap <HashSet<String>, String> TST = new HashMap<HashSet<String>, String>(length.get(Integer.toString(0)));
+		HashMap <HashSet<String>, String> TST =
+			new HashMap<HashSet<String>, String>(length.get(Integer.toString(0)));
 		String shortestPath = TST.get(Vprime);
 
 		/*
