@@ -83,10 +83,19 @@ The algorithm presented in the problem statement doesn't have any provision that
 \end{algorithmic}
 \end{algorithm}
 \subsection*{Complexity \& Correctness}
-We are guaranteed the upperbound on complexity because finding the  max in line 3 can be done in the alloted time because in one double for loop over the sets and the elements in the sets ($\Theta(\sum\limits_{S\in F}|S|)$) we can find out the sets cardinality, find out which sets hold which elements, and see the elements of the sets. It takes unit time to for every operation which stores an element in one of the appropriate data structures. Then, the computation that occurs inside the main while loop will visit every element of U exactly once and in doing so, will remove the element from any set it is included in. Therefore, every element in every set that wil eventually form the finite cover is visited exactly once. Once again, the corresponding data structures can be updated in unit time for every element. Since we might not need to visit every element in every 
+We are guaranteed the upperbound on complexity because finding the  max in line 3 can be done in the alloted time because in one double for loop over the sets and the elements in the sets ($\Theta(\sum\limits_{S\in F}|S|)$) we can find out the sets cardinality, find out which sets hold which elements, and see the elements of the sets. We need to receive the data in the structures I have mentioned, otherwise organizing the data will by itself take $\Theta(\sum\limits_{S\in F}|S|)$ time.
+
+It takes unit time to for every operation which stores an element in one of the appropriate data structures. Then, the computation that occurs inside the main while loop will visit every element of U exactly once and in doing so, will remove the element from any set it is included in. Therefore, every element in every set that wil eventually form the finite cover is visited exactly once. Once again, the corresponding data structures can be updated in unit time for every element. 
+
+Since we don't delete the elements from the other sets in F until we are sure that U is not empty, we can assert the upper bound. We might not need to visit every element from every set of S. 
 
 \section*{Problem 2}
 
 \section*{Problem 3}
+\begin{gather}
+F_{k - 1} < F_{k}, \;\;\; 3 < k\\
+F_{i} + F_{i-1} \le F_{i+k},\;\;\; 1 \le k\\
+\implies  F_{j+1} + F_{j} + F_{j-1} < F_{j}+F_{j-1} + F_K \textrm{ for } K > j+1
+\end{gather}
 
 \end{document}
