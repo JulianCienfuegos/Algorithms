@@ -38,42 +38,33 @@
 \item Dictionary indexByCard := \{key = cardinality : value = indices of sets with this cardinality\}
 \end{enumerate}
 \subsection*{Algorithm in Text}
-The algorithm presented in the problem statement doesn't have any provision that the subsets are even a cover. I am assuming that they are, because the pseudocode in the problem statement will not terminate otherwise.
-
+The idea of my algorithm is to maintain a dictionary of the number of sets of each cardinality. We will go through the sets of largest cardinality, and, one by one, add the set to the list of covers, delete all of the set's elements from U, and then check if U has been covered. If it hasn't been covered we have to update our data. We set the cardinality of the set to zero, and then go through its elements. For each element, we find which sets it was in and delete the element from those sets. Then we decrement the cardinalities of those sets. We then go back and grab another set of equally large cardinality as the first, until there are no more sets of the 'largest cardinality', at which point we decrement the 'largest cardinality', and begin looking  at subsets of smaller cardinality. 
 \subsection*{Pseudocode}
 \begin{algorithm}
 \caption{Greedy Set Covering }\label{euclid}
 \begin{algorithmic}[1]
-\Procedure{SetCovering}{\textit{X}, \textit{F}}
-\State Set up the datastructures indicated in the datastructures section above.
-\State $\textit{U} \gets \textit{X}$
-\State M $\gets$ $\max\limits_{index}\{cardByIndex.value\}$
+\Procedure{SetCovering}{Arguments are the above mentioned datastructures.}
+\State M $\gets$ $\max\limits_{index}$\{cardByIndex.value\}
 \While {M $>$ 0}
 \For{curr $\in$ indexByCard.value[M]}%%%
-\State S = sets[curr]
-\For{el $\in$ sets[curr]} %
-\State Delete el from sets[curr].value
-\State Delete el from \textit{U}
-\State Delete s from indexByCard[M]
-\State cardByIndex[curr].value $\gets$ 0
-\EndFor %
 \State Add curr to T.
-\If U == $\varnothing$
+\For{el $\in$ sets[curr]} %
+\State Delete el from \textit{U}
+\EndFor %
+\If {U == $\varnothing$}
 \State Break
 \Else
-\For{el $\in$ S} %
-\State Delete el from S
+\State Delete curr from indexByCard[M]
+\State Add curr to indexByCard[0]
+\State cardByIndex[curr].value $\gets$ 0
+\For{el $\in$ sets[curr]} %
 \For{s$\in$ inSets[el]}%%
 \State Delete el from sets[s].value
 \State Decrement cardByIndex[s].value
 \State Delete s from indexByCard[card].value
 \State Add s to indexByCard[card - 1].value
 \EndFor%%
-\State Delete el from \textit{U}
-\State Delete s from indexByCard[M]
-\State cardByIndex[curr].value $\gets$ 0
 \EndFor %
-\State S = sets[curr]
 \EndIf
 \EndFor%%%
 \State Decrement M
@@ -90,12 +81,26 @@ It takes unit time to for every operation which stores an element in one of the 
 Since we don't delete the elements from the other sets in F until we are sure that U is not empty, we can assert the upper bound. We might not need to visit every element from every set of S. 
 
 \section*{Problem 2}
+Our set must be covered by two sets. Imagine the set is cut into two halves and these halves are covered by subsets. Therefore OPT=2.
+ 
 
 \section*{Problem 3}
-\begin{gather}
-F_{k - 1} < F_{k}, \;\;\; 3 < k\\
-F_{i} + F_{i-1} \le F_{i+k},\;\;\; 1 \le k\\
-\implies  F_{j+1} + F_{j} + F_{j-1} < F_{j}+F_{j-1} + F_K \textrm{ for } K > j+1
-\end{gather}
+Claim:
+\begin{gather*}
+1 + \sum\limits_{i=1}^{k}F_i = F_{k+2}
+\end{gather*}
+Verify:
+\begin{gather*}
+1 + \sum\limits_{i=1}^{k-1}F_i+F_k=F_{k+1} + F_k\\
+1+\sum\limits_{i=1}^{k-1}F_i=F_{k+1}\dots\\
+1+\sum\limits_{i=1}^1F_i=F_3\\
+2=2
+\end{gather*}
+Furthermore
+\begin{gather*}
+F_{k+1} = F_k + F_{k-1} \ge   \sum\limits_{i=1}^kF_i 
+\end{gather*}
+Or you can flip the above on its head and it is a proof by induction. The Fibonacci sequence is monotonically increasing (strictly for $k\ge2$). Given the preceding observations, after $k-1$ combinations of elements we will have combined letters up to $a_k$, and the least weighted node/letter will be node $a_{k+1}$. The next lightest node/letter will be the node with weight $\frac{\sum\limits_{i=1}^kF_i}{\sum\limits_{i=1}^N}$ formed by merging the preceding lightest nodes (For proof see the above claim). 
 
+One of two possible encodings has $a_1$ having $n-1$ zeros. For all other letters $a_k$, the encoding is $n-k$ zeros followed by a one. There other possible enconding switches $a_1$ and $a_2$, and the other encodings stay the same.
 \end{document}
