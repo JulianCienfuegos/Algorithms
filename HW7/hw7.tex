@@ -1,0 +1,92 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1.0in]{geometry}
+\usepackage{url}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{sectsty}
+\usepackage{amssymb}
+
+\setlength\parindent{10pt}
+\allowdisplaybreaks
+\lhead{CSE 6331 HW1}
+\chead{Melvyn Ian Drag}
+\rhead{\today}
+
+
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\sectionfont{\normalfont\sffamily\large}
+\subsectionfont{\normalfont\sffamily\center\large\itshape}
+
+\begin{document}
+\section*{Problem 1}
+\subsection*{Datastructures}
+\begin{enumerate}
+\item A hashset U of elements. 
+\item Dictionary inSets := \{key = element: value = The indices of the sets which contain this element.\}
+\item Dictionary sets := \{key = index: value = (Hashset of) elements in the set `index'. \}
+\item Dictionary cardByIndex := \{key = index: value = cardinality of set `index' \}
+\item Dictionary indexByCard := \{key = cardinality : value = indices of sets with this cardinality\}
+\end{enumerate}
+\subsection*{Algorithm in Text}
+The algorithm presented in the problem statement doesn't have any provision that the subsets are even a cover. I am assuming that they are, because the pseudocode in the problem statement will not terminate otherwise.
+
+\subsection*{Pseudocode}
+\begin{algorithm}
+\caption{Greedy Set Covering }\label{euclid}
+\begin{algorithmic}[1]
+\Procedure{SetCovering}{\textit{X}, \textit{F}}
+\State Set up the datastructures indicated in the datastructures section above.
+\State $\textit{U} \gets \textit{X}$
+\State M $\gets$ $\max\limits_{index}\{cardByIndex.value\}$
+\While {M $>$ 0}
+\For{curr $\in$ indexByCard.value[M]}%%%
+\State S = sets[curr]
+\For{el $\in$ sets[curr]} %
+\State Delete el from sets[curr].value
+\State Delete el from \textit{U}
+\State Delete s from indexByCard[M]
+\State cardByIndex[curr].value $\gets$ 0
+\EndFor %
+\State Add curr to T.
+\If U == $\varnothing$
+\State Break
+\Else
+\For{el $\in$ S} %
+\State Delete el from S
+\For{s$\in$ inSets[el]}%%
+\State Delete el from sets[s].value
+\State Decrement cardByIndex[s].value
+\State Delete s from indexByCard[card].value
+\State Add s to indexByCard[card - 1].value
+\EndFor%%
+\State Delete el from \textit{U}
+\State Delete s from indexByCard[M]
+\State cardByIndex[curr].value $\gets$ 0
+\EndFor %
+\State S = sets[curr]
+\EndIf
+\EndFor%%%
+\State Decrement M
+\EndWhile
+\State \Return T
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+\subsection*{Complexity \& Correctness}
+We are guaranteed the upperbound on complexity because finding the  max in line 3 can be done in the alloted time because in one double for loop over the sets and the elements in the sets ($\Theta(\sum\limits_{S\in F}|S|)$) we can find out the sets cardinality, find out which sets hold which elements, and see the elements of the sets. It takes unit time to for every operation which stores an element in one of the appropriate data structures. Then, the computation that occurs inside the main while loop will visit every element of U exactly once and in doing so, will remove the element from any set it is included in. Therefore, every element in every set that wil eventually form the finite cover is visited exactly once. Once again, the corresponding data structures can be updated in unit time for every element. Since we might not need to visit every element in every 
+
+\section*{Problem 2}
+
+\section*{Problem 3}
+
+\end{document}
