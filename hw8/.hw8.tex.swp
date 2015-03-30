@@ -1,0 +1,56 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{sectsty}
+\usepackage{calligra}
+\usepackage[T1]{fontenc}
+
+
+\allowdisplaybreaks
+\lhead{CSE 6331 HW8}
+\chead{\Large Melvyn Ian Drag}
+\rhead{\today}
+\setlength{\parskip}{1pt} 
+
+\sectionfont{\Large}
+\subsectionfont{\large}
+
+\begin{document}
+\section*{Problem 1}
+A minimum spanning tree connects all of the vertices in graph in the cheapest way possible. Certainly a vertex in an MST can have degree six, as there can be six equilateral triangles drawn around a single vertex. Let us assume that a vertex has degree 7. Then, there are seven points that are closer to this vertex than to any other vertex in the complete graph.
+
+\section*{Problem 2}
+Use the Jarvis's march repeatedly to calculate a hull, remove those vertices from our universe of points, and continue until no points remain. Jarvis's March is $O(nh)$. Therefore, if there are N layers, each containing $h_i$ points, we have the runtime 
+\begin{equation*}
+\sum\limits_{i=1}^{N}O((n-\sum\limits_{j=1}^{i-1}h_j)h_i) = O(n_1h_1+n_2h_2 + \dots n_Nh_N) =O(n^2)
+\end{equation*}
+
+\section*{Problem 3}
+This problem is essentially the problem of finding the leftmost (right-/top-/bottommost) intersection point of the line segments. Let's call these points $l, r, t, b$. The boundary of the rectangle will be described in clockwise order by $
+(l_x, t_y), (r_x, t_y),  (r_x, b_y), (l_x, b_y)$ where the subscript denotes the part of the coordinate we are interested in. Luckily we have an $O(nlog(n))$ algorithm for finding these points. 
+
+Given two coordinates, the line passing through these coordinates can be placed in standard form $Ax + By = C$ in constant time. Furthermore, Gaussian elimination can be used to solve a 2x2 system in constant time. Therefore, we can modify the ANY-SEGMENTS-INTERSECT algorithm from CLRS to return, instead of TRUE or FALSE, the location of a leftmost intersection point, without changing the complexity - we just add a couple of function calls which take two line segments as parameters and place them in standard form and find the location of the intersection. At the start of the function, we initialize LeftmostIntersectionPoint to $(-\infty, -\infty)$. As we loop over $p$, we keep track of the leftmost intersection point. At the end of the function we return the leftmost point, and if it is non-infinite we will be able to make a bounding rectangle.
+
+In this last paragraph I have only described the leftmost intersection location. We can change the sorting of the points to be right to left, top down, or bottom up, and get the other extreme intersection points in this way.
+
+\section*{Problem 4}
+\subsection*{i.}
+Assume $(p,q)$ is in the MST. Assume there is another vertex $s$ of the MST which is in the lune of these two points. Then, deleting edge $(p,q)$ and replacing with $(s,q)$ or $(p,s)$ would decrease the weight of the tree, because $dist(s,q) < dist(p,q)$ and $dist(p,s) < dist(p,q)$. This is a contradiction, so there can be no other vertex in $lune(p,q)$.
+\subsection*{ii.}
+If $(p,q)$ is a Delaunay edge, then there exists at least one point equidistant from both $p$ and $q$ that is closer to both $p$ and $q$ than any other vertex in $S$. Place a midpoint $m$ between $p$ and $q$. Then, assume there is a vertex $s$ which is closer to $m$ than either $p$ or $q$. $s$ cannot be in the lunar region, so let us minimize the distance from $s$ to $m$ by placing $s$ on the boundary of the lune. Assume, without loss of generality, that $s$ lies on the arc drawn by the ball around $p$ intersecting the ball about $q$. Now we will show that $m$ is closer to $p$ and $q$ than it is to $s$. 
+
+Consider the triangle $\Delta smp$:
+\begin{gather*}
+dist(p,s) = dist(p,q) \\
+dist(p,m )= dist(m, q)  = dist(p,q) / 2\\
+\implies dist(m,s) > dist(p,q) / 2
+\end{gather*}
+A contradiction. So there is at least one point closer to both $p$ and $q$ than any other vertex. 
+\end{document}
