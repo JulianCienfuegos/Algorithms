@@ -1,0 +1,46 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{sectsty}
+
+
+
+\allowdisplaybreaks
+\lhead{CSE 6331 HW8}
+\chead{\Large Melvyn Ian Drag}
+\rhead{\today}
+\setlength{\parskip}{1pt} 
+
+\sectionfont{\Large}
+\subsectionfont{\large}
+
+\begin{document}
+\section*{Problem 1}
+Modify $A$ by adding two constraints which force the solution to a vertex, or to something non-feasible. Specifically, add two rows, $-a_i$ and $-a_j$ to $A$ and add the negatives of the constraining values to the bottom of b, too. There are $m$ choose $2$ ways to do this. Take the maximum value of the constraint equation you find by this method, it will be at a vertex.
+
+\section*{Problem 2}
+We have a source vertex $s$ and an end vertex $e$. We want to find the value of a shortest path. The linear program is written as:
+
+\[  \max d_t  \left\{
+\begin{array}{ll}
+       d_v \le d_u + w(u, v), \forall (u, v) \in E\\
+       d_s = 0\\
+\end{array} 
+\right. \]
+
+Let $d$ denote the length of an optimal path from $s$ to $e$. If for all $v$, $d_v$ is replaced by the $Dv$, the length of a shortest path to $v$, then the constraints are satisfied. (The distance from $s$ to itself is zero, and certainly the shortest distance from $s$ to $v$ is shorter than or equal to a distance from $s$ to $u$ plus the edge length from $u$ to $v$, by the triangle inequality. So, $d_e\ge d$. Now, let's see if we can flip the inequality to derive an equality.
+
+Consider the path $(s, v_1, v_2, \dots, v_n =  e)$ of minimal length $d$.  Due to the constraints, $d_s = 0$, $d_1 \le w(s, v_1$, $d_2 \le d_1 + w(v_1, v_2)$, and $d_i \le \sum\limits_{i=1, n} w(v_{i-1}, v_i)$ by the same reasoning. Hence, $d_n = d_e \le d$. 
+
+Now we need to formulate this in a form which we can feed to an LP solver. We can rewrite constraint (1) as $d_v - d_u \le w(u,v)$, and we can rewrite constraint (2) as $d_S \ge 0$ and $d_s \le 0$. 
+
+So, we have $O(|E|)$ constraints. We can set this up as a matrix equation. Each row in our matrix $A$ has two non zero entries, a 1 and a -1. We are solving for $\vec{d}$. Our right hand side is the vector of weights. 
+
+Some bad things could happen in the case where the weights were negative, and there were a cycle. But, we have the weights in $R+$, so there is no need to worry.
+\end{document}
